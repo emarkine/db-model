@@ -1,5 +1,5 @@
-require "bundler/setup"
-require "db/model"
+require 'bundler/setup'
+require 'db/model'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

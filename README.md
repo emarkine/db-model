@@ -21,7 +21,7 @@ Or install it yourself as:
 
 ## Usage
 
-To work with single model use the following tasks.
+Work with single model migration in place of several migration.
 
 Dump rails model Name into file spec/fixtures/names.yml  
 ```bash

@@ -1,4 +1,4 @@
-require "db/model/version"
+require 'db/model/version'
 
 module Db
   module Model
