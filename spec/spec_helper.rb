@@ -1,5 +1,6 @@
 require 'bundler/setup'
 require 'db/model'
+require 'rake'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

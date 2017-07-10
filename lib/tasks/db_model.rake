@@ -1,6 +1,7 @@
-require 'active_record/fixtures'
+# require 'active_record/fixtures'
 
 namespace :db do
+
   namespace :model do
     PATH = 'spec/fixtures'
 
@@ -34,8 +35,8 @@ namespace :db do
       s
     end
 
-    desc 'Dump model into fixtures (argument:[model,"exclude1,exclude2,..."])'
-    task :dump, [:model, :excluded] => :environment do |task, args|
+    desc 'Dump model into fixtures (argument:[model])'
+    task :dump, [:model] => :environment do |task, args|
       if args[:model]
         model_name = args[:model]
         # model_name = model_name.split('/').map{|c| c.capitalize}.join('::')
@@ -58,52 +59,9 @@ namespace :db do
       end
     end
 
-    desc 'Dump model into fixtures (argument:[model]) [Old Version]'
-    task :dump_old, [:model] => :environment do |task, args|
-      if args[:model]
-        model_name = args[:model]
-        model = model_name.split("/").map { |c| c.capitalize }.join("::").constantize
-        entries = model.find(:all, :order => 'id ASC')
-        formatted, increment, tab = '', 1, '  '
-        entries.each do |a|
-          formatted += model_name + '_' + increment.to_s + ':' + "\n"
-          increment += 1
-          a.attributes.each do |column, value|
-            formatted += tab
-            value = value.to_s
-            if value.match(/\n/) || value.match(/"/)
-              formatted += column + ': |' + "\n"
-              value.gsub!(/\r\n?/, "\n")
-              value.split("\n").each do |v|
-                formatted += tab + tab + v.strip + "\n"
-              end
-              formatted.chop!
-            else
-              formatted += column + ': '
-              unless value.blank?
-                if value.index(":") || value.index("_") || value.index("[") || value.index("]") || value.index("<") || value.index(">")
-                  formatted += '"' + value + '"'
-                else
-                  formatted += value
-                end
-              end
-            end
-            formatted += "\n"
-          end
-          formatted += "\n"
-        end
-        model_file = "#{Rails.root}/#{PATH}/#{model_name.pluralize}.yml"
-        File.delete(model_file) if File.exists?(model_file)
-        File.open(model_file, 'w') { |f| f << formatted }
-        puts "Model #{model} dumped into #{PATH}/#{model_name.pluralize}.yml for #{Rails.env} environment."
-      else
-        puts "Usage: rake #{task}[model]"
-      end
-    end
-
 
     def correct_attributes(model_name)
-      model = model_name.split("/").map { |c| c.capitalize }.join("::").constantize
+      model = model_name.split('/').map { |c| c.capitalize }.join("::").constantize
       model.columns_hash.each do |name, column|
         if (column.type == :time || column.type == :datetime) && name != 'updated_at' && name !='created_at'
           correct_time(model, name)
@@ -162,7 +120,6 @@ namespace :db do
     task :up, [:model] => :environment do |task, args|
       if args[:model]
         table = args[:model].gsub("/", "_").pluralize
-        #Rake::Task['db:rolled:dump'].invoke args[:model]
         file = FileList.new(File.join(Rails.root, "db/migrate/*_create_#{table}.rb")).first
         raise "Can't find create migration for model #{args[:model]}" unless file
         version = /\d{14}/.match(file).to_s

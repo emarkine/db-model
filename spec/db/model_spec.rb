@@ -5,8 +5,9 @@ RSpec.describe Db::Model do
     expect(Db::Model::VERSION).not_to be nil
   end
 
-  # it 'does something useful' do
-  #   expect(false).to eq(true)
-  # end
+  it 'Return usage text' do
+    text = Rake::Task['db:model:dump'].invoke
+    expect(text).not_to be nil
+  end
 
 end

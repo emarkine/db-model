@@ -2,6 +2,6 @@ require 'db/model/version'
 
 module Db
   module Model
-    # Your code goes here...
+    require 'lib/db/model/railtie' if defined?(Rails)
   end
 end
