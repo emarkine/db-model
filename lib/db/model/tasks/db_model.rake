@@ -1,4 +1,3 @@
-# require 'active_record/fixtures'
 
 namespace :db do
 
@@ -27,9 +26,19 @@ namespace :db do
       object_id + list.join("\n")
     end
 
-    def simple_dump(item)
-      s = "#{item.class.name.downcase}_#{item.id}:\n" # compose unique id
+    def simple_dump(model, item)
+      if model.method_defined? :name
+        id = item.name.delete(' ')
+      else
+        id = "#{model.downcase}_#{item.id}"
+      end
+      s = "#{id}:\n" # compose unique id
       item.attributes.each do |column, value|
+        next if column == 'id'
+        next if value.nil?
+        if value.instance_of? String
+          value = "\'#{value}\'" if value.index(/[+]/)
+        end
         s += "  #{column}: #{value}\n"
       end
       s
@@ -49,7 +58,7 @@ namespace :db do
           #puts dump(item,args[:excluded])
           items.each do |item|
             # file.puts dump(item, args[:excluded])
-            file.puts simple_dump(item)
+            file.puts simple_dump(model, item)
             file.puts "\n"
           end
         end
