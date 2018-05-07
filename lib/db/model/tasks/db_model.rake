@@ -27,6 +27,7 @@ namespace :db do
     end
 
     def simple_dump(model, item)
+      return item.to_dump if model.method_defined? :to_dump
       if model.method_defined? :name
         id = item.name.delete(' ')
       else
