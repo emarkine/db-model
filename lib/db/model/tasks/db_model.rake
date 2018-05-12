@@ -26,19 +26,29 @@ namespace :db do
       object_id + list.join("\n")
     end
 
+    def id_name(model, item)
+      if model.method_defined? :name
+        return item.name.delete(' ')
+      else
+        return "#{model.downcase}_#{item.id}"
+      end
+    end
+
+
     def simple_dump(model, item)
       return item.to_dump if model.method_defined? :to_dump
-      if model.method_defined? :name
-        id = item.name.delete(' ')
-      else
-        id = "#{model.downcase}_#{item.id}"
-      end
+      id = id_name(model, item)
       s = "#{id}:\n" # compose unique id
       item.attributes.each do |column, value|
         next if column == 'id'
-        next if value.nil?
+        next if value.blank?
         if value.instance_of? String
           value = "\'#{value}\'" if value.index(/[+]/)
+        elsif column.end_with? '_id'
+          field = column[0...-3].to_sym
+          object = item.send(field)
+          value = object.name.delete(' ') if object
+          column = field.to_s
         end
         s += "  #{column}: #{value}\n"
       end
