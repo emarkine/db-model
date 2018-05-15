@@ -30,7 +30,7 @@ namespace :db do
       if model.method_defined? :name
         return item.name.delete(' ')
       else
-        return "#{model.downcase}_#{item.id}"
+        return "#{model.to_s.downcase}_#{item.id}"
       end
     end
 

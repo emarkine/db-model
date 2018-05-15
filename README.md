@@ -49,6 +49,9 @@ $ rails db:model:reset[name]
 ```
 
 If the model has the field :name then dump procedure use this field as indeficator. 
+
+References between models like belongs_to will dumped in yml file with readable name and not with id numbers.
+
 You can also define method to_dump in your models for an unregular cases.
 
 ## Development
