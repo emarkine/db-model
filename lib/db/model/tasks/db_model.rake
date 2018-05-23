@@ -1,4 +1,3 @@
-
 namespace :db do
 
   namespace :model do
@@ -27,7 +26,9 @@ namespace :db do
     end
 
     def id_name(model, item)
-      if model.method_defined? :name
+      if model.method_defined? :to_id
+        return item.to_id
+      elsif model.method_defined? :name
         return item.name.delete(' ')
       else
         return "#{model.to_s.downcase}_#{item.id}"
@@ -40,7 +41,13 @@ namespace :db do
       id = id_name(model, item)
       s = "#{id}:\n" # compose unique id
       item.attributes.each do |column, value|
-        next if column == 'id'
+        if column == 'id'
+          if model.method_defined? :to_id
+            value = item.to_id
+          else
+            next
+          end
+        end
         next if value.blank?
         if value.instance_of? String
           value = "\'#{value}\'" if value.index(/[+]/)
@@ -68,6 +75,7 @@ namespace :db do
           #item = items[0]
           #puts dump(item,args[:excluded])
           items.each do |item|
+            puts item
             # file.puts dump(item, args[:excluded])
             file.puts simple_dump(model, item)
             file.puts "\n"
@@ -81,7 +89,7 @@ namespace :db do
 
 
     def correct_attributes(model_name)
-      model = model_name.split('/').map { |c| c.capitalize }.join("::").constantize
+      model = model_name.split('/').map {|c| c.capitalize}.join("::").constantize
       model.columns_hash.each do |name, column|
         if (column.type == :time || column.type == :datetime) && name != 'updated_at' && name !='created_at'
           correct_time(model, name)
